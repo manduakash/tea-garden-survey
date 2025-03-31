@@ -45,11 +45,11 @@ const data = {
       url: "/surveyed-households",
       icon: House,
     },
-    {
-      title: "Growth Breakdowns",
-      url: "/growth-breakdowns",
-      icon: FileChartLine,
-    },
+    // {
+    //   title: "Growth Breakdowns",
+    //   url: "/growth-breakdowns",
+    //   icon: FileChartLine,
+    // },
     {
       title: "Health Metrics",
       url: "/health-metrics",

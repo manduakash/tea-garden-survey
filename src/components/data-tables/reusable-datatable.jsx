@@ -151,7 +151,7 @@ export function DataTable({ columns, data: initialData }) {
 
 
     return (
-        <div className="overflow-hidden mx-10">
+        <div className="overflow-hidden mx-0">
             <div className="py-4 px-0 flex justify-between items-center">
                 <Input
                     placeholder="Search..."
@@ -174,7 +174,7 @@ export function DataTable({ columns, data: initialData }) {
             <Card className="border py-0 rounded-xl">
                 <Table className="rounded-xl overflow-hidden">
                     <TableHeader className="rounded-t-xl bg-slate-100">
-                        {table.getHeaderGroups().map((headerGroup, index) => (
+                        {table?.getHeaderGroups()?.map((headerGroup, index) => (
                             <TableRow key={index} className="pl-10">
                                 {index === 0 && <TableHead className="flex justify-center items-center">Sl. No.</TableHead>}
                                 {headerGroup.headers.map((header, i) => (
