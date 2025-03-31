@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import * as XLSX from "xlsx";
-import { FileSpreadsheet } from "lucide-react";
+import { Eye, FileSpreadsheet } from "lucide-react";
 import { Card } from "../ui/card";
 
 export function LivelihoodDataTable({ data: initialData }) {
@@ -30,7 +30,7 @@ export function LivelihoodDataTable({ data: initialData }) {
   const [selectedRow, setSelectedRow] = React.useState(null); // State to store the selected row
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 5, // Show 5 rows in the table
+    pageSize: 10,
   });
 
   // Filter data based on search query
@@ -91,12 +91,13 @@ export function LivelihoodDataTable({ data: initialData }) {
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => {
-              setSelectedRow(row.original); // Set the selected row data
+              setSelectedRow(row?.original); // Set the selected row data
               setIsDialogOpen(true); // Open the dialog
             }}
           >
-            View Details
+            <Eye className="text-cyan-600" />View
           </Button>
         ),
       },
@@ -179,7 +180,7 @@ export function LivelihoodDataTable({ data: initialData }) {
         </Table>
         <div className="flex items-center justify-between p-4">
           <div className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} | Total Records: {filteredData.length}
+          <span className="font-bold">Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</span> | Total Records: {filteredData.length}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -202,19 +203,32 @@ export function LivelihoodDataTable({ data: initialData }) {
         </div>
       </Card>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Row Details</DialogTitle>
+        <DialogContent className="p-0">
+          <DialogHeader className="flex flex-col items-center bg-cyan-600 text-white p-4 rounded-t-lg">
+            <DialogTitle>Household Details</DialogTitle>
           </DialogHeader>
-          {selectedRow && (
-            <div className="space-y-2">
-              {Object.entries(selectedRow).map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key}:</strong> {JSON.stringify(value, null, 2)}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-4 p-6">
+            <div className="font-medium">Household ID:</div>
+            <div>{selectedRow?.household_id}</div>
+
+            <div className="font-medium">SHG Member:</div>
+            <Badge className={selectedRow?.shg_member ? "bg-green-500" : "bg-red-500"}>
+              {selectedRow?.shg_member ? "Yes" : "No"}
+            </Badge>
+
+            <div className="font-medium">Wants to Join SHG:</div>
+            <Badge className={selectedRow?.wants_to_join_shg ? "bg-green-500" : "bg-red-500"}>
+              {selectedRow?.wants_to_join_shg ? "Yes" : "No"}
+            </Badge>
+
+            <div className="font-medium">Training Required:</div>
+            <Badge className={selectedRow?.training_required ? "bg-green-500" : "bg-red-500"}>
+              {selectedRow?.training_required ? "Yes" : "No"}
+            </Badge>
+
+            <div className="font-medium">Training Option:</div>
+            <div>{selectedRow?.training_option || "N/A"}</div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

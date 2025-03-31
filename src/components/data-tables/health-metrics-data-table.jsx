@@ -20,20 +20,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import * as XLSX from "xlsx";
-import { FileSpreadsheet } from "lucide-react";
+import { Eye, FileSpreadsheet, IconChevronsLeft, IconChevronLeft, IconChevronRight, IconChevronsRight, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { Card } from "../ui/card";
+import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 export function HealthMetricsDataTable({ data: initialData }) {
   const [data, setData] = React.useState(() => initialData);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState(null); // State to store the selected row
+  const [selectedRow, setSelectedRow] = React.useState(null);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 5, // Show 5 rows in the table
+    pageSize: 10,
   });
 
-  // Filter data based on search query
   const filteredData = React.useMemo(() => {
     if (!searchQuery) return data;
     return data.filter((row) =>
@@ -45,34 +46,13 @@ export function HealthMetricsDataTable({ data: initialData }) {
 
   const columns = React.useMemo(
     () => [
-      {
-        accessorKey: "id",
-        header: "Sl. No.",
-      },
-      {
-        accessorKey: "name",
-        header: "Name",
-      },
-      {
-        accessorKey: "gender",
-        header: "Gender",
-      },
-      {
-        accessorKey: "age",
-        header: "Age",
-      },
-      {
-        accessorKey: "height",
-        header: "Height (cm)",
-      },
-      {
-        accessorKey: "weight",
-        header: "Weight (kg)",
-      },
-      {
-        accessorKey: "bmi",
-        header: "BMI",
-      },
+      { accessorKey: "id", header: "Sl. No." },
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "gender", header: "Gender" },
+      { accessorKey: "age", header: "Age" },
+      { accessorKey: "height", header: "Height (cm)" },
+      { accessorKey: "weight", header: "Weight (kg)" },
+      { accessorKey: "bmi", header: "BMI" },
       {
         accessorKey: "nutrition_status",
         header: "Nutrition Status",
@@ -80,14 +60,14 @@ export function HealthMetricsDataTable({ data: initialData }) {
           <Badge
             variant="outline"
             className={
-              row.original.nutrition_status === "SAM"
+              row?.original?.nutrition_status === "SAM"
                 ? "text-red-500"
-                : row.original.nutrition_status === "MAM"
-                ? "text-yellow-500"
-                : "text-green-500"
+                : row?.original?.nutrition_status === "MAM"
+                  ? "text-yellow-500"
+                  : "text-green-500"
             }
           >
-            {row.original.nutrition_status}
+            {row?.original?.nutrition_status}
           </Badge>
         ),
       },
@@ -99,11 +79,11 @@ export function HealthMetricsDataTable({ data: initialData }) {
             variant="outline"
             size="sm"
             onClick={() => {
-              setSelectedRow(row.original); // Set the selected row data
-              setIsDialogOpen(true); // Open the dialog
+              setSelectedRow(row?.original);
+              setIsDialogOpen(true);
             }}
           >
-            View Details
+            <Eye className="text-cyan-600" /> View
           </Button>
         ),
       },
@@ -114,15 +94,12 @@ export function HealthMetricsDataTable({ data: initialData }) {
   const table = useReactTable({
     data: filteredData,
     columns,
-    state: {
-      pagination,
-    },
+    state: { pagination },
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  // Handle Excel file export
   const handleExportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -139,27 +116,17 @@ export function HealthMetricsDataTable({ data: initialData }) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-1/3"
         />
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            className="hover:bg-green-100 bg-green-50 border-green-700/40"
-            onClick={handleExportToExcel}
-          >
-            <FileSpreadsheet className="text-green-700" /> Export to Excel
-          </Button>
-        </div>
+        <Button variant="outline" onClick={handleExportToExcel}>
+          <FileSpreadsheet className="text-green-700" /> Export to Excel
+        </Button>
       </div>
-      <Card className="overflow-hidden rounded-lg border shadow-md dark:border-slate-700 dark:bg-slate-800 py-0">
-        <Table>
-          <TableHeader className="bg-slate-100 dark:bg-slate-700 my-0">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
+      <Card className="border py-0 rounded-xl">
+        <Table className="rounded-xl overflow-hidden">
+          <TableHeader className="rounded-t-xl bg-gray-200">
+            {table?.getHeaderGroups()?.map((headerGroup) => (
+              <TableRow key={headerGroup?.id}>
+                {headerGroup?.headers?.map((header) => (
+                  <TableHead key={header?.id}>{flexRender(header?.column?.columnDef?.header, header?.getContext())}</TableHead>
                 ))}
               </TableRow>
             ))}
@@ -169,59 +136,82 @@ export function HealthMetricsDataTable({ data: initialData }) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  No results.
-                </TableCell>
+                <TableCell colSpan={columns.length} className="text-center">No results.</TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
         <div className="flex items-center justify-between p-4">
-          <div className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} | Total Records: {filteredData.length}
-          </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+            <Label>Rows per page</Label>
+            <Select value={`${pagination.pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))}>
+              <SelectTrigger className="w-20">
+                <SelectValue placeholder={pagination.pageSize} />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 20, 30, 40, 50].map((size) => (
+                  <SelectItem key={size} value={`${size}`}>{size}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>Page {pagination.pageIndex + 1} of {table.getPageCount()}</div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}><ChevronsLeft /></Button>
+            <Button variant="outline" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}><ChevronLeft /></Button>
+            <Button variant="outline" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}><ChevronRight /></Button>
+            <Button variant="outline" onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}><ChevronsRight /></Button>
           </div>
         </div>
       </Card>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Row Details</DialogTitle>
+        <DialogContent className="p-0">
+          <DialogHeader className="flex flex-col items-center bg-cyan-600 text-white p-4 rounded-t-lg">
+            <DialogTitle>Health Info.</DialogTitle>
           </DialogHeader>
-          {selectedRow && (
-            <div className="space-y-2">
-              {Object.entries(selectedRow).map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key}:</strong> {JSON.stringify(value, null, 2)}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-4 p-6">
+            <div className="font-medium">Household No:</div>
+            <div>{"WB-H2Y-"+selectedRow?.household_id}</div>
+
+            <div className="font-medium">Name:</div>
+            <div>{selectedRow?.name}</div>
+
+            <div className="font-medium">Gender:</div>
+            <div>{selectedRow?.gender}</div>
+
+            <div className="font-medium">Date of Birth:</div>
+            <div>{selectedRow?.dob}</div>
+
+            <div className="font-medium">Age:</div>
+            <div>{selectedRow?.age}</div>
+
+            <div className="font-medium">Height (cm):</div>
+            <div>{selectedRow?.height}</div>
+
+            <div className="font-medium">Weight (kg):</div>
+            <div>{selectedRow?.weight}</div>
+
+            <div className="font-medium">BMI:</div>
+            <div>{selectedRow?.bmi}</div>
+
+            <div className="font-medium">Nutrition Status:</div>
+            <div>{selectedRow?.nutrition_status}</div>
+
+            <div className="font-medium">Blood Pressure:</div>
+            <div>{selectedRow?.bp}</div>
+
+            <div className="font-medium">Sugar Level:</div>
+            <div>{selectedRow?.sugar_level}</div>
+
+            <div className="font-medium">Remarks:</div>
+            <div>{selectedRow?.remarks}</div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

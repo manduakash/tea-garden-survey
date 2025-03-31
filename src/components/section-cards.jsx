@@ -16,7 +16,7 @@ export function SectionCards() {
     {
       description: "Total Households Surveyed",
       title: "2,736",
-      footerText: "Surveys recorded in the last 30 days",
+      footerText: "Last 30 days survey records",
       footerIcon: <IconTrendingUp className="size-4" />,
       footerStat: "Last month (+2.8%)",
       footerTextColor: "text-cyan-600 dark:text-slate-400",
@@ -26,7 +26,7 @@ export function SectionCards() {
     {
       description: "Number of Members",
       title: "9,234",
-      footerText: "Performed well in the last 30 days",
+      footerText: "Last 30 days survey records",
       footerIcon: <IconTrendingDown className="size-4" />,
       footerStat: "Down 8% this month",
       footerTextColor: "text-amber-600 dark:text-slate-400",

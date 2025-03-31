@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import * as XLSX from "xlsx";
-import { FileSpreadsheet } from "lucide-react";
+import { Eye, FileSpreadsheet } from "lucide-react";
 import { Card } from "../ui/card";
 
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), {
@@ -54,7 +54,7 @@ export function HouseHoldsDataTable({ data: initialData }) {
   const [selectedRow, setSelectedRow] = React.useState(null); // State to store the selected row
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 5, // Show 5 rows in the table
+    pageSize: 10,
   });
 
   // Filter data based on search query
@@ -104,12 +104,13 @@ export function HouseHoldsDataTable({ data: initialData }) {
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => {
-              setSelectedRow(row.original); // Set the selected row data
+              setSelectedRow(row?.original); // Set the selected row data
               setIsDialogOpen(true); // Open the dialog
             }}
           >
-            View Details
+            <Eye className="text-cyan-600" />View
           </Button>
         ),
       },
@@ -192,7 +193,7 @@ export function HouseHoldsDataTable({ data: initialData }) {
         </Table>
         <div className="flex items-center justify-between p-4">
           <div className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} | Total Records: {filteredData.length}
+            <span className="font-bold">Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</span> | Total Records: {filteredData.length}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -215,25 +216,62 @@ export function HouseHoldsDataTable({ data: initialData }) {
         </div>
       </Card>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-[80vw] min-w-[80vw] w-[80vw] md:w-[60vw] lg:w-[40vw] xl:w-[30vw]">
-          <DialogHeader>
-            <DialogTitle>Row Details</DialogTitle>
+        <DialogContent className="w-[80%] min-w-[80%] h-auto p-0">
+          <DialogHeader className="flex items-center bg-cyan-600 text-white p-4 rounded-t-lg">
+            <DialogTitle className="text-4xl font-semibold">Survey Details</DialogTitle>
           </DialogHeader>
-          {selectedRow && (
-            <div className="space-y-4 flex">
-              <div className="space-y-2">
-                {Object.entries(selectedRow).map(([key, value]) => (
-                  <div key={key}>
-                    <strong>{key}:</strong> {JSON.stringify(value, null, 2)}
-                  </div>
-                ))}
+
+          {/* Main Content with Two Columns */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 w-full ">
+            {/* Left Side: Survey Details (Scrollable) */}
+            <div className="overflow-y-auto px-8 py-6">
+              <div className="grid grid-cols-2 gap-2 text-lg">
+                <div className="font-semibold">Survey ID:</div>
+                <div>{selectedRow?.survey_id}</div>
+
+                <div className="font-semibold">State:</div>
+                <div>{selectedRow?.state}</div>
+
+                <div className="font-semibold">District:</div>
+                <div>{selectedRow?.district}</div>
+
+                <div className="font-semibold">Sub Division:</div>
+                <div>{selectedRow?.sub_division}</div>
+
+                <div className="font-semibold">Block:</div>
+                <div>{selectedRow?.block}</div>
+
+                <div className="font-semibold">Gram Panchayat:</div>
+                <div>{selectedRow?.gp}</div>
+
+                <div className="font-semibold">Village:</div>
+                <div>{selectedRow?.village}</div>
+
+                <div className="font-semibold">House Number:</div>
+                <div>{selectedRow?.house_number}</div>
+
+                <div className="font-semibold">Family Income:</div>
+                <div>₹{selectedRow?.family_income.toLocaleString()}</div>
+
+                {selectedRow?.latitude && selectedRow?.longitude && (
+                  <>
+                    <div className="font-semibold">Latitude:</div>
+                    <div>{selectedRow?.latitude}</div>
+
+                    <div className="font-semibold">Longitude:</div>
+                    <div>{selectedRow?.longitude}</div>
+                  </>
+                )}
               </div>
-              {selectedRow?.latitude && selectedRow?.longitude && (
+            </div>
+
+            {/* Right Side: Map (Fixed) */}
+            {selectedRow?.latitude && selectedRow?.longitude && (
+              <div className="flex items-center justify-center p-6">
                 <MapContainer
-                className=""
                   center={[selectedRow?.latitude, selectedRow?.longitude]}
                   zoom={13}
-                  style={{ height: "450px", width: "90%" }}
+                  style={{ height: "90%", width: "100%", borderRadius: "8px" }}
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -252,9 +290,9 @@ export function HouseHoldsDataTable({ data: initialData }) {
                     </Popup>
                   </Marker>
                 </MapContainer>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

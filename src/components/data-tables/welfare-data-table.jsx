@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import * as XLSX from "xlsx";
-import { FileSpreadsheet } from "lucide-react";
+import { Eye, FileSpreadsheet } from "lucide-react";
 import { Card } from "../ui/card";
 
 export function WelfareDataTable({ data: initialData }) {
@@ -30,7 +30,7 @@ export function WelfareDataTable({ data: initialData }) {
   const [selectedRow, setSelectedRow] = React.useState(null); // State to store the selected row
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 5, // Show 5 rows in the table
+    pageSize: 10,
   });
 
   // Filter data based on search query
@@ -47,7 +47,7 @@ export function WelfareDataTable({ data: initialData }) {
     () => [
       {
         accessorKey: "id",
-        header: "ID",
+        header: "Sl. No.",
       },
       {
         accessorKey: "household_id",
@@ -108,12 +108,13 @@ export function WelfareDataTable({ data: initialData }) {
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => {
-              setSelectedRow(row.original); // Set the selected row data
+              setSelectedRow(row?.original); // Set the selected row data
               setIsDialogOpen(true); // Open the dialog
             }}
           >
-            View Details
+            <Eye className="text-cyan-600" />View
           </Button>
         ),
       },
@@ -196,7 +197,7 @@ export function WelfareDataTable({ data: initialData }) {
         </Table>
         <div className="flex items-center justify-between p-4">
           <div className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} | Total Records: {filteredData.length}
+            <span className="font-bold">Page {table.getState().pagination.pageIndex + 1} of {table?.getPageCount()}</span> | Total Records: {filteredData?.length}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -219,17 +220,34 @@ export function WelfareDataTable({ data: initialData }) {
         </div>
       </Card>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Row Details</DialogTitle>
+        <DialogContent className="p-0">
+          <DialogHeader className="flex flex-col items-center bg-cyan-600 text-white p-4 rounded-t-lg"> 
+            <DialogTitle>Household Details</DialogTitle>
           </DialogHeader>
           {selectedRow && (
-            <div className="space-y-2">
-              {Object.entries(selectedRow).map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key}:</strong> {JSON.stringify(value, null, 2)}
-                </div>
-              ))}
+            <div className="grid grid-cols-2 gap-4 p-6">
+              <div className="font-medium">Household ID:</div>
+              <div>{selectedRow.household_id}</div>
+
+              <div className="font-medium">Caste Certificate:</div>
+              <Badge className={selectedRow.caste_certificate ? "bg-green-500" : "bg-red-500"}>
+                {selectedRow.caste_certificate ? "Yes" : "No"}
+              </Badge>
+
+              <div className="font-medium">Lakshmir Bhandar:</div>
+              <Badge className={selectedRow.lakshmir_bhandar ? "bg-green-500" : "bg-red-500"}>
+                {selectedRow.lakshmir_bhandar ? "Yes" : "No"}
+              </Badge>
+
+              <div className="font-medium">Swasthya Sathi:</div>
+              <Badge className={selectedRow.swasthya_sathi ? "bg-green-500" : "bg-red-500"}>
+                {selectedRow.swasthya_sathi ? "Yes" : "No"}
+              </Badge>
+
+              <div className="font-medium">Old Age Pension:</div>
+              <Badge className={selectedRow.old_age_pension ? "bg-green-500" : "bg-red-500"}>
+                {selectedRow.old_age_pension ? "Yes" : "No"}
+              </Badge>
             </div>
           )}
         </DialogContent>
